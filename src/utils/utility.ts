@@ -113,3 +113,5 @@ async function fetchData(): Promise<string> {
 type ResolvedResult = Awaited<ReturnType<typeof fetchData>>;
 
 // NonNullable<Type>
+type NonNullTypeTest = NonNullable<string[] | null | undefined>
+// remove null
