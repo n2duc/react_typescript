@@ -1,107 +1,101 @@
-import Card from "./components/Card";
-import { Permission } from "./utils/enums";
+import { useEffect, useReducer, useRef, useState } from "react";
 
-const reviews: {
-    name: string;
-    image: string;
-    stars: number;
-    premiumUser: boolean;
-    date: string | number;
-}[] = [
-    {
-        name: "Evondev",
-        image: "",
-        stars: 5,
-        premiumUser: true,
-        date: "05/09/2022",
-    },
-    {
-        name: "CharkaUI",
-        image: "",
-        stars: 4,
-        premiumUser: false,
-        date: "03/08/2022",
-    },
-    {
-        name: "React Query",
-        image: "",
-        stars: 3,
-        premiumUser: false,
-        date: "04/08/2022",
-    },
-];
-type Age = 18 | 20 | 21;
-const user: {
-    firstName: string;
-    lastName: string;
-    age: Age;
-    isGirlFriend: boolean;
-    favorites: (string | number)[];
-    permission: Permission;
-} = {
-    firstName: "Ngoc",
-    lastName: "Duc",
-    age: 20,
-    isGirlFriend: false,
-    favorites: ["game", "soccer", "coding"],
-    permission: Permission.ADMIN,
-};
+type HeadingProp = {
+    title: string,
+}
+type ActionType = | { type: "ADD", text: string } | { type: "REMOVE", id: number }
+interface Todo {
+    id: number;
+    text: string;
+}
 
-const travelItem: {
-    image: string;
-    name: string;
-    totalReview: number;
-    rating: number;
-    location: string;
-    price: number;
-    date: string;
-    departure: string;
-    features: { wifi: boolean; parking: boolean; specialOffer: boolean };
-}[] = [
-    {
-        image: "https://source.unsplash.com/random",
-        name: "Ngoc Duc",
-        totalReview: 3,
-        rating: 5,
-        location: "Tan Hao",
-        price: 120,
-        date: "12/08/2023",
-        departure: "none",
-        features: {
-            wifi: true,
-            parking: true,
-            specialOffer: false,
-        },
-    },
-];
+interface Data {
+    text: string;
+}
+
+const Heading = ({ title }: HeadingProp) => {
+    return <h2 className="font-bold text-2xl mb-5">{title}</h2>
+}
+
+const todoReducer = (state: Todo[], action: ActionType) => {
+    switch(action.type) {
+        case "ADD":
+            return [...state, { id: state.length, text: action.text }]
+        case "REMOVE":
+            return state.filter((todo: Todo) => todo.id !== action.id);
+        default:
+            throw new Error("")
+    }
+}
+const initialState: Todo[] = [];
 
 const App = () => {
-    function displayView(totalReview: number, name: string, premium: boolean) {
-        return (
-            <>
-                Review total <strong>{totalReview}</strong> | Last reviewed by{" "}
-                <strong>{name}</strong> {premium ? "⭐️" : ""}
-            </>
-        );
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [todos, dispatch] = useReducer(todoReducer, initialState);
+    const onRemoveTodo = (todoId: number) => {
+        dispatch({
+            type: "REMOVE",
+            id: todoId
+        })
     }
+    const handleAddTodo = () => {
+        if (inputRef.current) {
+            dispatch({
+                type: "ADD",
+                text: inputRef.current.value,
+            })
+            inputRef.current.value = "";
+        }
+    }
+    const [data, setData] = useState<Data | null>(null);
+    useEffect(() => {
+        fetch("/data.json")
+            .then(res => res.json())
+            .then((data) => {
+                setData(data);
+            })
+    }, []);
 
+    const onClickItem = (item: string) => {
+        alert(item);
+    }
     return (
-        <div className="review">
-            <div className="review-image">
-                <img src="https://source.unsplash.com/random" alt="" />
+        <div>
+            <Heading title="Todo App"></Heading>
+            <div className="max-w-sm">
+                <div className="flex items-center gap-x-5">
+                    <input ref={inputRef} type="text" className="py-2 px-4 border border-slate-200 rounded-md outline-none" />
+                    <button onClick={handleAddTodo} className="py-2 px-4 rounded-md bg-blue-400 text-white text-center">Add todo</button>
+                </div>
+                {todos.map((todo) => (
+                    <div key={todo.id} className="flex items-center gap-x-3 mt-3">
+                        <span>{todo.text}</span>
+                        <button onClick={() => onRemoveTodo(todo.id)} className="p-2 rounded-md bg-red-500 text-white text-sm font-medium">Remove</button>
+                    </div>
+                ))}
+                {JSON.stringify(data)}
+                <List items={['Nguyen', 'Ngoc', 'Duc']} onClickItem={(item: string) => onClickItem(item)}></List>
+                <Boxed>
+                    <p>Xin chao, tao la chua te cua bau troi</p>
+                </Boxed>
             </div>
-            <div className="review-info">
-                {displayView(
-                    reviews.length,
-                    reviews[0].name,
-                    reviews[0].premiumUser
-                )}
-                {user.firstName}
-                {travelItem[0].location}
-            </div>
-            <Card title="Hello world" description="Dit con me may thang lol" link="#"></Card>
         </div>
     );
 };
+
+const List = ({ items, onClickItem }: { items: string[], onClickItem?: (item: string) => void }) => {
+    return (
+        <div>
+            {items.map((item) => (
+                <div key={item} onClick={() => onClickItem?.(item)}>{item}</div>
+            ))}
+        </div>
+    )
+}
+const Boxed = ({ children } : { children: React.ReactNode }) => {
+    return (
+        <div>{children}</div>
+    )
+}
 
 export default App;

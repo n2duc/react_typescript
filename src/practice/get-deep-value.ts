@@ -11,3 +11,8 @@ const Owner = {
     }
 }
 // getDeepValue(Owner, "colleague", "major") => "Pedagogy"
+
+function getDeepValue<T, K extends keyof T, SK extends keyof T[K]>(obj: T, firstKey: K, secondKey: SK) {
+    return obj[firstKey][secondKey];
+}
+getDeepValue(Owner, "colleague", "major")
