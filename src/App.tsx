@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useTodos from "./hooks/useTodos";
+import TicTacToe from "./components/tictactoe/TicTacToe";
 
 type HeadingProp = {
     title: string,
@@ -29,8 +30,8 @@ const App = () => {
     }
     return (
         <div>
-            <Heading title="Todo App"></Heading>
-            <div className="max-w-sm">
+            <div className="max-w-2xl p-5">
+                <Heading title="Todo App"></Heading>
                 <div className="flex items-center gap-x-5">
                     <input ref={inputRef} type="text" className="py-2 px-4 border border-slate-200 rounded-md outline-none" />
                     <button onClick={handleAddTodo} className="py-2 px-4 rounded-md bg-blue-400 text-white text-center">Add todo</button>
@@ -58,6 +59,7 @@ const App = () => {
                 <View as="h2" className="text-lg font-semibold">Heading</View>
                 <View as="button" type="button" className="px-3 py-2 rounded-md border border-slate-600">Heading</View>
             </div>
+            <TicTacToe />
         </div>
     );
 };

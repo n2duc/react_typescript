@@ -4,6 +4,6 @@
 
 @layer base {
     body {
-        @apply p-5 font-poppins;
+        @apply font-poppins;
     }
 }
